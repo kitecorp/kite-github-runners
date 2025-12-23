@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in your values
+# DO NOT commit terraform.tfvars to version control
+
+aws_region  = "us-east-1"
+environment = "prod"
+
+# VPC Configuration
+vpc_id     = "vpc-xxxxxxxxx"
+subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
+
+# GitHub App Configuration
+# Create a GitHub App: https://docs.github.com/en/apps/creating-github-apps
+github_app_id         = "123456"
+github_app_key_base64 = "base64-encoded-private-key"
+github_webhook_secret = "your-webhook-secret"
+
+# Runner Configuration
+prefix = "github-runner"
+
+linux_x64_max_runners   = 5
+linux_arm64_max_runners = 5
+windows_x64_max_runners = 3
+
+enable_spot_instances = true
+
+runner_extra_labels = ["aws", "self-hosted"]
