@@ -50,8 +50,8 @@ module "github_runner" {
         # Organization or repository level runners
         enable_organization_runners = var.enable_organization_runners
 
-        # Instance configuration - m5/c5 families for x64
-        instance_types        = ["m5ad.large", "m5a.large", "m5d.large", "c5.large", "c5a.large"]
+        # Instance configuration - memory-optimized for native builds (16GB RAM)
+        instance_types        = ["r6i.large", "r5.large", "r5a.large", "r6a.large", "m5.large"]
         runners_maximum_count = var.linux_x64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023
@@ -101,8 +101,8 @@ module "github_runner" {
         # Organization or repository level runners
         enable_organization_runners = var.enable_organization_runners
 
-        # Instance configuration - Graviton instances (t4g/c6g/m6g families)
-        instance_types        = ["t4g.large", "c6g.large", "m6g.large", "c7g.large", "m7g.large"]
+        # Instance configuration - memory-optimized Graviton for native builds (16GB RAM)
+        instance_types        = ["r6g.large", "r7g.large", "r6g.medium", "m6g.large", "m7g.large"]
         runners_maximum_count = var.linux_arm64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023 ARM64
@@ -152,8 +152,8 @@ module "github_runner" {
         # Organization or repository level runners
         enable_organization_runners = var.enable_organization_runners
 
-        # Instance configuration - Windows requires more resources
-        instance_types        = ["m5.large", "c5.large", "m5a.large", "c5a.large"]
+        # Instance configuration - memory-optimized for Windows builds (16GB RAM)
+        instance_types        = ["r6i.large", "r5.large", "r5a.large", "r6a.large", "m5.large"]
         runners_maximum_count = var.windows_x64_max_runners
 
         # Windows boot time is longer
