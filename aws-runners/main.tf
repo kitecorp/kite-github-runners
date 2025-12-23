@@ -2,8 +2,13 @@
 # GitHub Actions Self-Hosted Runners on AWS
 # Supports: Linux x64, Linux arm64, Windows x64
 # Note: macOS is NOT supported by this module due to EC2 Mac Dedicated Host requirements
+#
+# IMPORTANT: Run ./scripts/download-lambdas.sh before terraform apply
 ################################################################################
 
+################################################################################
+# Multi-Runner Module
+################################################################################
 module "github_runner" {
   source  = "github-aws-runners/github-runner/aws//modules/multi-runner"
   version = "7.0.0"
@@ -20,15 +25,10 @@ module "github_runner" {
     webhook_secret = var.github_webhook_secret
   }
 
-  # Webhook configuration
-  webhook_lambda_zip = null
-  webhook_lambda_apigateway_access_log_settings = {
-    destination_arn = null
-    format          = null
-  }
-
-  # Enable Organization runners (set to false for repository-level runners)
-  enable_organization_runners = true
+  # Lambda zip files - download with: ./scripts/download-lambdas.sh
+  webhook_lambda_zip                = "${path.module}/webhook.zip"
+  runners_lambda_zip                = "${path.module}/runners.zip"
+  runner_binaries_syncer_lambda_zip = "${path.module}/runner-binaries-syncer.zip"
 
   multi_runner_config = {
     #---------------------------------------------------------------------------
@@ -47,38 +47,27 @@ module "github_runner" {
         runner_name_prefix  = "linux-x64_"
         runner_extra_labels = var.runner_extra_labels
 
+        # Organization or repository level runners
+        enable_organization_runners = var.enable_organization_runners
+
         # Instance configuration - m5/c5 families for x64
         instance_types        = ["m5ad.large", "m5a.large", "m5d.large", "c5.large", "c5a.large"]
         runners_maximum_count = var.linux_x64_max_runners
 
-        # AMI configuration - Amazon Linux 2023 x64
-        ami = {
-          filter = {
-            name  = ["al2023-ami-kernel-6.1-x86_64"]
-            state = ["available"]
-          }
-          owners = ["amazon"]
-        }
+        # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023
+        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
 
         # Spot instances for cost savings
         instance_allocation_strategy  = var.enable_spot_instances ? "price-capacity-optimized" : "lowest-price"
         instance_target_capacity_type = var.enable_spot_instances ? "spot" : "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners      = true
-        enable_ssm_on_runners         = true
-        enable_runner_binaries_syncer = true
+        enable_ephemeral_runners = true
+        enable_ssm_on_runners    = true
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
         minimum_running_time_in_minutes = 5
-
-        # Instance metadata options
-        instance_metadata_options = {
-          http_endpoint               = "enabled"
-          http_tokens                 = "required"
-          http_put_response_hop_limit = 2
-        }
 
         # Block device configuration
         block_device_mappings = [{
@@ -109,38 +98,27 @@ module "github_runner" {
         runner_name_prefix  = "linux-arm64_"
         runner_extra_labels = var.runner_extra_labels
 
+        # Organization or repository level runners
+        enable_organization_runners = var.enable_organization_runners
+
         # Instance configuration - Graviton instances (t4g/c6g/m6g families)
         instance_types        = ["t4g.large", "c6g.large", "m6g.large", "c7g.large", "m7g.large"]
         runners_maximum_count = var.linux_arm64_max_runners
 
-        # AMI configuration - Amazon Linux 2023 arm64
-        ami = {
-          filter = {
-            name  = ["al2023-ami-kernel-6.1-arm64"]
-            state = ["available"]
-          }
-          owners = ["amazon"]
-        }
+        # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023 ARM64
+        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-arm64"
 
         # Spot instances for cost savings
         instance_allocation_strategy  = var.enable_spot_instances ? "price-capacity-optimized" : "lowest-price"
         instance_target_capacity_type = var.enable_spot_instances ? "spot" : "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners      = true
-        enable_ssm_on_runners         = true
-        enable_runner_binaries_syncer = true
+        enable_ephemeral_runners = true
+        enable_ssm_on_runners    = true
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
         minimum_running_time_in_minutes = 5
-
-        # Instance metadata options
-        instance_metadata_options = {
-          http_endpoint               = "enabled"
-          http_tokens                 = "required"
-          http_put_response_hop_limit = 2
-        }
 
         # Block device configuration
         block_device_mappings = [{
@@ -171,6 +149,9 @@ module "github_runner" {
         runner_name_prefix  = "windows-x64_"
         runner_extra_labels = var.runner_extra_labels
 
+        # Organization or repository level runners
+        enable_organization_runners = var.enable_organization_runners
+
         # Instance configuration - Windows requires more resources
         instance_types        = ["m5.large", "c5.large", "m5a.large", "c5a.large"]
         runners_maximum_count = var.windows_x64_max_runners
@@ -178,34 +159,20 @@ module "github_runner" {
         # Windows boot time is longer
         runner_boot_time_in_minutes = 20
 
-        # AMI configuration - Windows Server 2022
-        ami = {
-          filter = {
-            name  = ["Windows_Server-2022-English-Full-ECS_Optimized-*"]
-            state = ["available"]
-          }
-          owners = ["amazon"]
-        }
+        # AMI configuration - Use AWS SSM parameter for Windows Server 2022
+        ami_id_ssm_parameter_name = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base"
 
         # On-demand for Windows (spot less reliable for Windows)
         instance_allocation_strategy  = "lowest-price"
         instance_target_capacity_type = "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners      = true
-        enable_ssm_on_runners         = true
-        enable_runner_binaries_syncer = true
+        enable_ephemeral_runners = true
+        enable_ssm_on_runners    = true
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
         minimum_running_time_in_minutes = 10
-
-        # Instance metadata options
-        instance_metadata_options = {
-          http_endpoint               = "enabled"
-          http_tokens                 = "required"
-          http_put_response_hop_limit = 2
-        }
 
         # Block device configuration - Windows needs more storage
         block_device_mappings = [{

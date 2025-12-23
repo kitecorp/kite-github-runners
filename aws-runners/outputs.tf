@@ -1,28 +1,22 @@
 output "webhook_endpoint" {
-  description = "API Gateway endpoint for GitHub webhooks"
+  description = "API Gateway endpoint for GitHub webhooks - configure this in your GitHub App"
   value       = module.github_runner.webhook.endpoint
 }
 
-output "webhook_secret_arn" {
-  description = "ARN of the webhook secret in Secrets Manager"
-  value       = module.github_runner.webhook.secret_arn
-  sensitive   = true
-}
-
-output "runners_lambda_function_names" {
-  description = "Names of the Lambda functions for runner management"
+output "webhook_lambda" {
+  description = "Webhook Lambda function details"
   value = {
-    scale_up   = module.github_runner.runners.scale_up.function_name
-    scale_down = module.github_runner.runners.scale_down.function_name
+    function_name = module.github_runner.webhook.lambda.function_name
+    log_group     = module.github_runner.webhook.lambda_log_group.name
   }
 }
 
-output "runners_role_arns" {
-  description = "IAM role ARNs for the runners"
-  value       = module.github_runner.runners.role_arn
+output "ssm_parameters" {
+  description = "SSM parameters created by the module"
+  value       = module.github_runner.ssm_parameters
 }
 
-output "runners_security_group_ids" {
-  description = "Security group IDs for the runners"
-  value       = module.github_runner.runners.security_group_id
+output "runners" {
+  description = "Runner configurations"
+  value       = keys(module.github_runner.runners_map)
 }

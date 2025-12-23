@@ -74,3 +74,9 @@ variable "runner_extra_labels" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_organization_runners" {
+  description = "Register runners at organization level (true) or repository level (false)"
+  type        = bool
+  default     = true
+}
