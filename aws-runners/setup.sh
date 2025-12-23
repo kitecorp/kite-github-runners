@@ -23,6 +23,12 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# If no org specified, ask for it
+if [ -z "$GITHUB_ORG" ]; then
+    echo ""
+    read -p "Enter GitHub organization name (or press Enter for personal account): " GITHUB_ORG
+fi
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
