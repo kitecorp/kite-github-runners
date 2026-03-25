@@ -9,10 +9,14 @@
 ################################################################################
 # Multi-Runner Module
 ################################################################################
-variable "instance_types" {
+variable "instance_types_linux_arm64" {
   type    = list(string)
+  default = ["r8g.large", "r7g.large", "r6g.large", "m8g.large", "m7g.large", "m6g.large"]
+}
+variable "instance_types_linux_x64" {
   default = ["r8i.large", "r8a.large", "r7i.large", "r7a.large", "r6i.large", "r6a.large", "r5.large", "r5a.large"]
 }
+
 module "github_runner" {
   source  = "github-aws-runners/github-runner/aws//modules/multi-runner"
   version = "7.0.0"
@@ -55,7 +59,7 @@ module "github_runner" {
         enable_organization_runners = var.enable_organization_runners
 
         # Instance configuration - memory-optimized for native builds (16GB RAM)
-        instance_types        = ["r8i.large", "r8a.large", "r7i.large", "r7a.large", "r6i.large", "r6a.large", "r5.large", "r5a.large"]
+        instance_types        = var.instance_types_linux_x64
         runners_maximum_count = var.linux_x64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023
@@ -106,7 +110,7 @@ module "github_runner" {
         enable_organization_runners = var.enable_organization_runners
 
         # Instance configuration - memory-optimized Graviton for native builds (16GB RAM)
-        instance_types        = ["r8g.large", "r7g.large", "r6g.large", "m8g.large", "m7g.large", "m6g.large"]
+        instance_types        = var.instance_types_linux_arm64
         runners_maximum_count = var.linux_arm64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023 ARM64
@@ -157,7 +161,7 @@ module "github_runner" {
         enable_organization_runners = var.enable_organization_runners
 
         # Instance configuration - memory-optimized for Windows builds (16GB RAM)
-        instance_types        = var.instance_types
+        instance_types        = ["r8i.large", "r8a.large", "r7i.large", "r7a.large", "r6i.large", "r6a.large", "r5.large", "r5a.large"]
         runners_maximum_count = var.windows_x64_max_runners
 
         # Windows boot time is longer
