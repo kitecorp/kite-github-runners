@@ -17,12 +17,15 @@ terraform {
   }
 }
 
+variable "project" {
+  default = ""
+}
 provider "aws" {
   region = var.aws_region
 
   default_tags {
     tags = {
-      Project     = "github-runners"
+      Project     = var.project
       Environment = var.environment
       ManagedBy   = "terraform"
     }

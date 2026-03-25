@@ -1,26 +1,71 @@
 # Copy this file to terraform.tfvars and fill in your values
 # DO NOT commit terraform.tfvars to version control
 
+# AWS Configuration
+# aws_region:  AWS region where runner infrastructure will be deployed
+# environment: Used to tag and namespace resources (e.g., dev, staging, prod)
 aws_region  = "us-east-1"
 environment = "prod"
 
 # VPC Configuration
+# vpc_id:     The VPC where runner EC2 instances will launch.
+#             Find it: AWS Console → VPC → Your VPCs, or: aws ec2 describe-vpcs
+# subnet_ids: Subnets within the VPC for runner instances. Use private subnets
+#             with NAT gateway access for security. At least one required.
+#             Find them: AWS Console → VPC → Subnets, or: aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxx"
 vpc_id     = "vpc-xxxxxxxxx"
 subnet_ids = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
 
 # GitHub App Configuration
 # Create a GitHub App: https://docs.github.com/en/apps/creating-github-apps
+#
+# github_app_id:
+#   1. Go to GitHub → Settings → Developer settings → GitHub Apps
+#   2. Select your GitHub App
+#   3. The App ID is shown on the app's General page
+#
+# github_app_key_base64:
+#   1. Go to GitHub → Settings → Developer settings → GitHub Apps
+#   2. Select your GitHub App
+#   3. Scroll to "Private keys" and click "Generate a private key"
+#   4. GitHub downloads a .pem file (e.g., your-app.2024-01-01.private-key.pem)
+#   5. Base64-encode it: base64 -i your-app.private-key.pem | tr -d '\n'
+#   6. Paste the output as the value below
+#
+# github_webhook_secret:
+#   A random string used to verify webhook payloads from GitHub.
+#   1. Generate one: openssl rand -hex 32
+#   2. Save it as the value below
+#   3. After terraform apply, go to your GitHub App → Webhook settings
+#   4. Paste the same secret in the "Webhook secret" field
+#   The secret must match on both sides for webhook validation to work.
+#
 github_app_id         = "123456"
 github_app_key_base64 = "base64-encoded-private-key"
 github_webhook_secret = "your-webhook-secret"
 
 # Runner Configuration
+# prefix: Naming prefix for all created resources (EC2, Lambda, API Gateway, etc.)
 prefix = "github-runner"
 
+# Maximum concurrent runners per platform/architecture.
+# Runners scale up on demand via webhooks and scale down when idle.
+# Set to 0 to disable a runner type.
 linux_x64_max_runners   = 5
 linux_arm64_max_runners = 5
 windows_x64_max_runners = 3
 
+# enable_spot_instances: Use EC2 Spot Instances for Linux runners to reduce cost
+#   (typically 60-90% cheaper). Spot instances may be interrupted by AWS, which
+#   is fine for CI jobs since GitHub will retry the workflow. Linux only.
 enable_spot_instances = true
 
+# runner_extra_labels: Additional labels to attach to all runners.
+#   Use these in workflow `runs-on` to target specific runners.
+#   Example: runs-on: [self-hosted, aws]
 runner_extra_labels = ["aws", "self-hosted"]
+
+# Webhook URL (output, not input):
+#   After running terraform apply, get the webhook URL:
+#     terraform output webhook_endpoint
+#   Then go to your GitHub App → Webhook settings and paste it as the Webhook URL.
