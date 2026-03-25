@@ -9,6 +9,10 @@
 ################################################################################
 # Multi-Runner Module
 ################################################################################
+variable "instance_types" {
+  type    = list(string)
+  default = ["r8i.large", "r8a.large", "r7i.large", "r7a.large", "r6i.large", "r6a.large", "r5.large", "r5a.large"]
+}
 module "github_runner" {
   source  = "github-aws-runners/github-runner/aws//modules/multi-runner"
   version = "7.0.0"
@@ -153,7 +157,7 @@ module "github_runner" {
         enable_organization_runners = var.enable_organization_runners
 
         # Instance configuration - memory-optimized for Windows builds (16GB RAM)
-        instance_types        = ["r8i.large", "r8a.large", "r7i.large", "r7a.large", "r6i.large", "r6a.large", "r5.large", "r5a.large"]
+        instance_types        = var.instance_types
         runners_maximum_count = var.windows_x64_max_runners
 
         # Windows boot time is longer
