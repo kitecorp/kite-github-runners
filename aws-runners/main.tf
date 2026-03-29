@@ -72,6 +72,7 @@ module "github_runner" {
         # Runner settings
         enable_ephemeral_runners = true
         enable_ssm_on_runners    = true
+        enable_cloudwatch_agent  = false
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
@@ -123,6 +124,7 @@ module "github_runner" {
         # Runner settings
         enable_ephemeral_runners = true
         enable_ssm_on_runners    = true
+        enable_cloudwatch_agent  = false
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
@@ -177,6 +179,7 @@ module "github_runner" {
         # Runner settings
         enable_ephemeral_runners = true
         enable_ssm_on_runners    = true
+        enable_cloudwatch_agent  = false
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
