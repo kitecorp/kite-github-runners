@@ -19,7 +19,7 @@ variable "instance_types_linux_x64" {
 
 module "github_runner" {
   source  = "github-aws-runners/github-runner/aws//modules/multi-runner"
-  version = "7.0.0"
+  version = "7.5.0"
 
   aws_region = var.aws_region
   vpc_id     = var.vpc_id
@@ -63,7 +63,7 @@ module "github_runner" {
         runners_maximum_count = var.linux_x64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023
-        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 
         # Spot instances for cost savings
         instance_allocation_strategy  = var.enable_spot_instances ? "price-capacity-optimized" : "lowest-price"
@@ -114,7 +114,7 @@ module "github_runner" {
         runners_maximum_count = var.linux_arm64_max_runners
 
         # AMI configuration - Use AWS SSM parameter for latest Amazon Linux 2023 ARM64
-        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-arm64"
+        ami_id_ssm_parameter_name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-arm64"
 
         # Spot instances for cost savings
         instance_allocation_strategy  = var.enable_spot_instances ? "price-capacity-optimized" : "lowest-price"
