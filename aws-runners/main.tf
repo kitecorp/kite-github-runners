@@ -70,7 +70,7 @@ module "github_runner" {
         instance_target_capacity_type = var.enable_spot_instances ? "spot" : "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners = true
+        enable_ephemeral_runners = false
         enable_ssm_on_runners    = true
         enable_cloudwatch_agent  = false
 
@@ -122,7 +122,7 @@ module "github_runner" {
         instance_target_capacity_type = var.enable_spot_instances ? "spot" : "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners = true
+        enable_ephemeral_runners = false
         enable_ssm_on_runners    = true
         enable_cloudwatch_agent  = false
 
@@ -177,7 +177,7 @@ module "github_runner" {
         instance_target_capacity_type = "on-demand"
 
         # Runner settings
-        enable_ephemeral_runners = true
+        enable_ephemeral_runners = false
         enable_ssm_on_runners    = true
         enable_cloudwatch_agent  = false
 
