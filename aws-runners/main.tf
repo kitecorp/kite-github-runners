@@ -128,7 +128,7 @@ module "github_runner" {
 
         # Scaling configuration
         scale_down_schedule_expression  = "cron(* * * * ? *)"
-        minimum_running_time_in_minutes = 15
+        minimum_running_time_in_minutes = 30
 
         # Block device configuration
         block_device_mappings = [{
